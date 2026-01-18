@@ -1,5 +1,3 @@
-                        
-import React from "react";
 import { Body } from "../layout/body";
 import { SidebarItems } from "../layout/infra/sidebar.infra";
 import { Main } from "../layout/main";

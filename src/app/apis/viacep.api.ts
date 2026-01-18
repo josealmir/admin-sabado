@@ -6,6 +6,7 @@ export class ViaCepApi {
 
 
   public static getAddressByCep(cep: string): Promise<ViaCepResponse> {
+
    return fetch(`${this.BASE_URL}/${cep}/json`)
       .then((response) => {response
          return response.json();

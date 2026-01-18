@@ -6,7 +6,9 @@ export const Sidebar = (props : SideBarProps) => {
   
   return (
        <div className="border-end bg-white" id="sidebar-wrapper">
-            <div className="sidebar-heading border-bottom bg-light">Start Bootstrap</div>
+            <div className="sidebar-heading border-bottom bg-light">
+                Barbear Shopping
+            </div>
             <div className="list-group list-group-flush">
                 <nav>
                     {

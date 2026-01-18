@@ -1,5 +1,5 @@
 {
-  "name": "teste-2",
+  "name": "barbear-shopping",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,10 +11,11 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "react": "^19.2.0",
     "react-bootstrap": "^2.10.10",
-    "react-dom": "^19.2.0",
     "react-router-dom": "^7.12.0",
+    "react-dom": "^19.2.0",
     "recharts": "^3.6.0"
   },
   "devDependencies": {

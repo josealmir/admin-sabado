@@ -11,7 +11,7 @@ export interface SidebarItem {
 }
 
 export const SidebarItems = [
-    { id: "dashboard", label: "Dashboard", to: "/" },
+    { id: "dashboard", label: "Dashboard", to: "/dashboard" },
     { id: "index", label: "Via Cep", to: "/index" },
     { id: "shortcuts", label: "Shortcuts", to: "/nao" },
     { id: "events", label: "Events", to: "/#!" },
