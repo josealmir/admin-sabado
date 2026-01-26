@@ -1,13 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 
 
-
-
 export const LoginPage = () => {
 
     const navigate = useNavigate();
     const onSubmitLogin = () => {
         navigate("/dashboard");
+    }
+
+    const onForgotPassword = () => {
+        navigate("/forgot-password");
     }
 
     return (   
@@ -28,7 +30,7 @@ export const LoginPage = () => {
                     <button type="submit" className="btn btn-primary w-100">Entrar</button>
                 </form>
                 <div className="mt-3 text-center">
-                    <a href="#">Esqueceu a senha?</a>
+                    <a onClick={onForgotPassword} href="#">Esqueceu a senha?</a>
                 </div>
             </div>
         </div>
