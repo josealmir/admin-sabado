@@ -18,7 +18,7 @@ export const IndexPage = () => {
 
     // Exemplo prático de uso do useMemo para filtrar ceps do estado de SP
     const cepsFiltrados = useMemo(() => {
-        return ceps.filter(item => item.uf === "SP");
+        return ceps;
     }, [ceps]);
 
 
@@ -55,7 +55,7 @@ export const IndexPage = () => {
                                     size="lg"
                                     variant="primary"
                                     disabled={pending}
-                                > {pending ? <span> <Spinner animation="border" size="sm" /> Pesquiando </span> : "Pesquisar"}</Button>
+                                > {pending ? <span> <Spinner animation="border" size="sm" /> Pesquisando </span> : "Pesquisar"}</Button>
                             </Col>
 
                             {
