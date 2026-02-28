@@ -2,19 +2,19 @@ import { Button, Col, Form, Row, Spinner } from "react-bootstrap"
 import { Main } from "../layout/main"
 import { Sidebar } from "../layout/sidebar"
 import { useMemo, useState } from "react";
-import { ViaCepApi } from "../app/apis/viacep.api";
 import { SidebarItems } from "../layout/infra/sidebar.infra";
 import { Body } from "../layout/body";
-import type { ViaCepResponse } from "../app/apis/models/responses/viacep.response";
+import { NotredameCepApi } from "../app/apis/notredame-cep.api";
+import type { Cep } from "../app/apis/models/responses/cep.response";
+import type { ErroApi } from "../app/apis/models/erro.api";
 
 
 export const IndexPage = () => {
 
     const [pending, setPending] = useState(false);
     const [cep, setCep] = useState("");
-    const [response, setResponse] = useState<ViaCepResponse | null>(null);
-    const [ceps, setCeps] = useState<ViaCepResponse[]>([]);
-
+    const [response, setResponse] = useState<Cep | null>(null);
+    const [ceps, setCeps] = useState<Cep[]>([]);
 
     // Exemplo prático de uso do useMemo para filtrar ceps do estado de SP
     const cepsFiltrados = useMemo(() => {
@@ -24,11 +24,13 @@ export const IndexPage = () => {
 
     const onSearchCep = () => {
         setPending(true);
-        ViaCepApi.getAddressByCep(cep)
+        NotredameCepApi.getCep(cep)
             .then((response) => {
                 setCeps(prev => [...prev, response]);
-                setResponse(response);
-            }).finally(() => {
+            }).catch((error: ErroApi) => {
+                console.log(error);
+            })
+            .finally(() => {
                 setPending(false);
             });
     }
@@ -57,18 +59,42 @@ export const IndexPage = () => {
                                     disabled={pending}
                                 > {pending ? <span> <Spinner animation="border" size="sm" /> Pesquisando </span> : "Pesquisar"}</Button>
                             </Col>
+                            <Row className="mt-4">
+                                <Col>
+                                    <table className="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Cep</th>
+                                                <th scope="col">Provider</th>
+                                                <th scope="col">Bairro</th>
+                                                <th scope="col">Cidade</th>
+                                                <th scope="col">Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            { 
+                                                cepsFiltrados.length > 0 ? cepsFiltrados.map((address) => {
+                                                    return (
+                                                        <tr key={address.zipCode}>
+                                                            <th scope="row">{address.zipCode}</th>
+                                                            <td>{address.provider}</td>
+                                                            <td>{address.district}</td>
+                                                            <td>{address.city}</td>
+                                                            <td>{address.state}</td>
+                                                        </tr>
+                                                    )
+                                                }) :
+                                                <tr>
+                                                    <td colSpan={5} className="text-center">Nenhum CEP encontrado</td>
+                                                </tr> 
+                                            }
 
-                            {
-                                cepsFiltrados.map((address) => {
-                                    return (<Row key={address.cep} className="mt-4">
-                                        <Col><strong>CEP:</strong> {address.cep} </Col>
-                                        <Col><strong>Logradouro:</strong> {address.logradouro} </Col>
-                                        <Col><strong>Bairro:</strong> {address.bairro} </Col>
-                                        <Col><strong>Cidade:</strong> {address.localidade} </Col>
-                                        <Col><strong>Estado:</strong> {address.uf} </Col>
-                                    </Row>)
-                                })
-                            }
+
+                                        </tbody>
+                                    </table>
+                                </Col>
+                            </Row>
+
                         </Row>
                     </Form>
                 </Main>
