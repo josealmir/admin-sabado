@@ -1,6 +1,6 @@
 import type { ErroApi } from "./models/erro.api";
 import type { CepCreate } from "./models/requests/cep.request";
-import type { Cep, CepPost } from "./models/responses/cep.response";
+import type { Cep, CepPost, PageResponse } from "./models/responses/cep.response";
 
 export class NotredameCepApi {
     
@@ -15,24 +15,40 @@ export class NotredameCepApi {
                 return await response.json();
             }).then((data) => {
                 return this.toCep(data);
-            }).catch((error) => {
-                throw error;
+            }).catch((error: ErroApi) => {
+                throw error as ErroApi;
+             });
+    }
+
+    public static getPage(): Promise<PageResponse<Cep>> {
+        const query = '?PageNumber=1&PageSize=10';
+        return fetch(`${this.baseUrl}${query}`)
+            .then(async (response) => {
+                if (!response.ok) {
+                    throw await response.json(); 
+                }
+                return await response.json();
+            }).then((data) => {
+                return this.toPageCep(data);
+            }).catch((error: ErroApi) => {
+                throw error as ErroApi;
              });
     }
 
     public static postCep(body: CepCreate): Promise<CepPost> {
-        return new Promise<CepPost>(resolve =>{
-            resolve({
-                id: "1",
-                createdAt: new Date().toISOString(),
-                zipCode: body.zipCode,
-                city: "Cidade Exemplo",
-                district: "Bairro Exemplo",
-                state: "EX",
-                ibge: "1234567",
-                provider: 1,
-                location: { lat: 0, lon: 0 }
-            } as CepPost);
+        return fetch(this.baseUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        }).then(async (response) => {
+            if (!response.ok) {
+                throw await response.json(); 
+            }
+            return await response.json();
+        }).catch((error: ErroApi) => {
+            throw error as ErroApi;
         });
     }
 
@@ -52,6 +68,13 @@ export class NotredameCepApi {
           provider: data.provider,
           location: data.location
         };
-      }
+    }
+
+    private static toPageCep(data: any): PageResponse<Cep> {
+        return {
+            page: data.page,
+            data: data.data.map((item: any) => this.toCep(item))
+        };
+    }
 
 }
