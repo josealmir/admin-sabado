@@ -53,13 +53,21 @@ export class NotredameCepApi {
     }
 
     public static deleteCep(id: string): Promise<void> {
-        return new Promise<void>(resolve => {
-            resolve();
-        });
+        return fetch(`${this.baseUrl}${id}`, {
+            method: 'DELETE',
+        }).then(async (response) => {
+            if (!response.ok) {
+                throw await response.json(); 
+            }
+            return await response.json();
+        }).catch((error: ErroApi) => {
+           throw error as ErroApi;
+        })
     }
 
     private static toCep(data: any): Cep {
         return {
+          externalId: data?.externalId || '',
           zipCode: data.zipCode,
           city: data.city,
           district: data.district,
