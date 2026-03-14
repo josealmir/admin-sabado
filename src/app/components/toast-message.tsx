@@ -5,11 +5,11 @@ import Header from "react-bootstrap/ToastHeader";
 import Body from "react-bootstrap/ToastBody";
 
 export interface ToastProps {
-  message: string,
-  type: 'Primary' | 'Secondary' | 'Success' | 'Danger' | 'Warning' | 'Info' | 'Light' | 'Dark'
+  message?: string,
+  type?: 'Primary' | 'Secondary' | 'Success' | 'Danger' | 'Warning' | 'Info' | 'Light' | 'Dark'
 }
 
-export function ToastMessage(props: ToastProps) {
+export function ToastMessage({  ...props }: ToastProps) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
