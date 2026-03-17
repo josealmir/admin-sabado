@@ -7,21 +7,23 @@ import type { ErroApi } from "../app/apis/models/erro.api";
 import { SidebarItems } from "../layout/infra/sidebar.infra";
 import { ModalConfirm } from "../app/components/modal-confirm";
 import { NotredameCepApi } from "../app/apis/notredame-cep.api";
-import { Button, Col, Form, Row, Spinner } from "react-bootstrap"
+import { Button, ButtonGroup, Col, Form, Row, Spinner } from "react-bootstrap"
 import type { Cep } from "../app/apis/models/responses/cep.response";
 import type { CepCreate } from "../app/apis/models/requests/cep.request";
 import { ToastMessage, type ToastProps } from "../app/components/toast-message";
+import { ModalDelete } from "../app/components/modal-delete";
 
 
 export const IndexPage = () => {
 
     const [cep, setCep] = useState("");
-    const [pending, setPending] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [showModal, setShowModal] = useState(false);
+    const [pending, setPending] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [showDelete, setShowDelete] = useState<boolean>(false);
+    const [id, setId] = useState<string | null>(null);
     const [ceps, setCeps] = useState<Cep[]>([]);
     const [toast, setToast] = useState<ToastProps | null>(null);
-    const [response, setResponse] = useState<Cep | null>(null);
     const [cepCreate, setCepCreate] = useState<CepCreate | null>(null);
 
 
@@ -68,9 +70,9 @@ export const IndexPage = () => {
         setLoading(true);
         NotredameCepApi.postCep(cepCreate ?? {} as CepCreate)
             .then((response) => {
-                setResponse(response);
                 onCancel();
                 setToast({ message: "Cep salvo com sucesso", type: 'Success' });
+                setCeps(prev => [...prev.filter(item => item.zipCode !== response.zipCode), response]);
             }).catch((error: ErroApi) => {
                 setToast({ message: `${error.status} :${error.detail}`, type: 'Danger' });
             })
@@ -82,8 +84,28 @@ export const IndexPage = () => {
     const onCancel = () => {
         setCepCreate(null);
         setShowModal(false);
+        setShowDelete(false);
+        setCep("");
     }
 
+    const onDelete = (id: string) =>{
+        setId(id);
+        setShowDelete(true);
+    }
+
+    const onConfirmDelete = () => {
+        setLoading(true);
+        NotredameCepApi.deleteCep(id ?? "")
+        .then(() => {
+            setShowDelete(false);
+            onSearchCep();
+        }).catch((error: ErroApi) => {
+            setToast({ message: `${error.status} :${error.detail}`, type: 'Danger' });
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+    }
 
     return (
         <>
@@ -134,11 +156,19 @@ export const IndexPage = () => {
                                                     <td>{address.city}</td>
                                                     <td>{address.state}</td>
                                                     <td>
-                                                        <button
-                                                            className="btn btn-sm btn-primary"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#modalConfirm"
-                                                            onClick={() => openModal(address.zipCode)}>Cadastrar</button>
+                                                        <ButtonGroup size="sm">
+                                                            <Button 
+                                                                disabled={address.externalId ===''? false : true}
+                                                                onClick={() => openModal(address.zipCode)}>
+                                                                Cadastar
+                                                            </Button>
+                                                            <Button 
+                                                                disabled={address.externalId !=='' ? false : true}
+                                                                className="btn btn-sm btn-danger" 
+                                                                onClick={() => onDelete(address.externalId)}>
+                                                                Excluir
+                                                            </Button>
+                                                        </ButtonGroup>
                                                     </td>
                                                 </tr>
                                             )
@@ -153,6 +183,7 @@ export const IndexPage = () => {
                     </Row>
                     <ToastMessage message={toast?.message} type={toast?.type} />
                     <ModalConfirm loading={loading} show={showModal} onConfirm={onConfirm} onCancel={onCancel} />
+                    <ModalDelete loading={loading} show={showDelete} onConfirm={onConfirmDelete} onCancel={onCancel} />
                 </Main>
             </Body>
         </>

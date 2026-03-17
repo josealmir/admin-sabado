@@ -1,6 +1,7 @@
 import type { Location } from "./location.reponse";
 
 export interface Cep {
+  externalId: string
   zipCode: string
   city: string
   district: string
